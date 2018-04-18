@@ -27,8 +27,30 @@ library(scatterplot3d)
 
 ## TDA(Topological Data analysis)とは
 
+位相幾何的な特徴の抽出を狙った分析である  
+TDAの基本的なツールとして、persistent homologyやmapperがある  
+今回はpersistent homologyを扱う 
 
+# persistent homologyとその表現
 
-# persistent homology, mapper
+point cloudの各点を中心とする超球を考える。   
+半径を増やしていったとき、ホモロジーが誕生(Birth)しては消える(Death)ことになる。
+この永続性を見ることをpersistent homologyという
 
-TDAの基本的なツールとして、
+persistent homology は、Birth, Deathの半径によって与えられえることになる。  
+その表現、要約方法が盛んに開発されてきた。
+
+## persistent diagram
+
+最も基本的なのがpersistent diagram(PD)である。  
+これは横軸にBirth, 縦軸にDeathをとったホモロジーの散布図である。  
+ホモロジーの次元により色を変えるのが一般的であり、可視化手法としては優れている。  
+しかし、PDをもとに主観的な判断を下すことは望ましくない
+
+## persistent landscape
+
+PDのさらに要約として、persistent landscapeがよく用いられる。  
+ノイズを含んだ実データでは、生まれてすぐに死ぬホモロジーが多数存在することになる。  
+より強い永続性を持った
+
+## barcode
