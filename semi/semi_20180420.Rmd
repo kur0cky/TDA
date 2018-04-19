@@ -2,13 +2,15 @@
 title: "semi_20180420"
 author: "Yutaka Kuroki"
 date: "2018年4月18日"
-output: html_document
+output: 
+  html_document: 
+    toc: true
 editor_options: 
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(include =FALSE)
+knitr::opts_chunk$set(include =FALSE, echo=FALSE, csche = TRUE)
 ```
 
 ```{r}
@@ -16,6 +18,7 @@ library(tidyverse)
 library(TDA)
 library(scatterplot3d)
 ```
+
 
 
 # はじめに
@@ -33,6 +36,18 @@ TDAの基本的なツールとして、persistent homologyやmapperがある
 
 # persistent homologyとその表現
 
+## 使用データ
+
+ここでは次のような円周一様分布を考える。
+
+```{r circular, include = TRUE}
+set.seed(1234)
+circ <- circleUnif(200)
+plot(circ)
+Diag <- alphaDiag(circ) 
+```
+
+
 point cloudの各点を中心とする超球を考える。   
 半径を増やしていったとき、ホモロジーが誕生(Birth)しては消える(Death)ことになる。
 この永続性を見ることをpersistent homologyという
@@ -47,10 +62,139 @@ persistent homology は、Birth, Deathの半径によって与えられえるこ
 ホモロジーの次元により色を変えるのが一般的であり、可視化手法としては優れている。  
 しかし、PDをもとに主観的な判断を下すことは望ましくない
 
+```{r PD}
+plot(Diag[["diagram"]])
+```
+
+
+## maximum persistetnce
+
+$$\text{max}(Death(r) - Birth(r))$$
+
 ## persistent landscape
 
 PDのさらに要約として、persistent landscapeがよく用いられる。  
 ノイズを含んだ実データでは、生まれてすぐに死ぬホモロジーが多数存在することになる。  
 より強い永続性を持った
 
-## barcode
+## barcode plot
+
+## persistence integral
+
+## bedi sequence
+
+# 時系列へのアプローチ
+
+point cloudさえ作ってしまえばpersistent homologyを計算することが出来る  
+主に用いられるのは、時間遅れ座標を用いた埋め込み(embedding)である  
+1次元である時系列データを任意の次元に埋め込むことが出来る
+
+しかし、以下のような悩ましいポイントがある
+
+- 時系列データの期間をどのようにするのか
+- 何次元に埋め込むのか($m$)
+- 時間遅れ座標の単位をどのようにすべきか($\tau$)
+
+## データ期間について
+
+一つの時系列から複数のpoint cloudを作成するために、スライド窓を用いる場合がある  
+位相幾何的な性質の移り変わりを見ることが出来る
+
+
+## 何次元に埋め込むのか
+
+ターケンスの埋め込み定理やFNN(False Nearest Neibor)がよく知られている。  
+
+
+## 時間遅れ座標の単位$\tau$
+
+大きすぎてもいけないし少なすぎてもいけない。
+系列の周期の整数倍は用いないほうが良い。  
+自己相関関数を推定し参考にすることもある
+
+# 事例紹介（人工データ）
+
+## pure data
+
+次のような関数を考える
+
+$$y = 4sin(x)sin(32x) + 4x$$
+```{r}
+pure <- data.frame(x = seq(0,pi, length = 500)) %>% 
+  mutate(y = 4 * sin(x) * sin(32*x) + 4*x) %>% 
+  mutate(t1 = lag(y, 1),
+         t2 = lag(y, 2),
+         t20 = lag(y, 20),
+         t40 = lag(y, 40),
+         t50 = lag(y, 50),
+         t100 = lag(y, 100),
+         t200 = lag(y, 200))
+```
+
+```{r pure_tsplot, include = TRUE}
+pure %>% 
+  ggplot(aes(x,y))+
+  geom_point()+
+  geom_line()+
+  theme_bw()
+```
+
+時間遅れ単位$\tau$を1, 20, 50, 100と変え3次元に埋め込んだ結果を次に示す
+
+```{r pure_scatterplot3d, include=TRUE}
+par(mfcol = c(2,2))
+pure %>% 
+  select(y,t1,t2) %>% 
+  scatterplot3d(highlight.3d = T)
+pure %>% 
+  select(y,t20,t40) %>% 
+  scatterplot3d(highlight.3d = T)
+pure %>% 
+  select(y,t50,t100) %>% 
+  scatterplot3d(highlight.3d = T)
+pure %>% 
+  select(y,t100,t200) %>% 
+  scatterplot3d(highlight.3d = T)
+```
+
+```{r}
+dev.off()
+```
+
+### PCA
+
+$\tau = 1$の場合でも、PCAを噛ませることで幾何的情報は取り出せることが示されている。
+
+```{r pure_pca_scatterplot3d, include = T}
+pure %>% 
+  select(y, t1, t2) %>% 
+  drop_na() %>% 
+  prcomp(x=.) %>% 
+  .$x %>% 
+  scatterplot3d(highlight.3d = T)
+```
+
+## low noisy data
+
+```{r}
+set.seed(1234)
+low_noisy <- data.frame(x = seq(0,pi, length = 500)) %>% 
+  mutate(y = 4 * sin(x) * sin(32*x) + 4*x + rnorm(500, mean=0, sd = 0.5)) %>% 
+  mutate(t20 = lag(y, 20),
+         t40 = lag(y, 40)
+         )
+```
+
+```{r low_noisy_tsplot, include = TRUE}
+low_noisy %>% 
+  ggplot(aes(x,y))+
+  geom_point()+
+  geom_line()+
+  theme_bw()
+```
+
+```{r low_noisy_scatterplot3d, include=TRUE}
+low_noisy %>% 
+  select(y,t20,t40) %>% 
+  scatterplot3d(highlight.3d = T)
+```
