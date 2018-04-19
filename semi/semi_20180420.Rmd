@@ -1,22 +1,25 @@
 ---
-title: "semi_20180420"
+title: "semi_20180420_1"
 author: "Yutaka Kuroki"
 date: "2018年4月18日"
 output: 
   html_document: 
     toc: true
+    number_section: true
+    md_extensions: -ascii_identifiers
 editor_options: 
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(include =FALSE, echo=FALSE, csche = TRUE)
+knitr::opts_chunk$set(include =FALSE, echo=FALSE, cache = TRUE, message = FALSE, warning = F)
 ```
 
 ```{r}
 library(tidyverse)
 library(TDA)
 library(scatterplot3d)
+library(RcppRoll)
 ```
 
 
@@ -25,33 +28,30 @@ library(scatterplot3d)
 
 ## 目的
 
-- TDAの分析の流れを知る
+- TDAの分析の流れを知る, 共有する
 - Bloombergコンペ, mazda プロジェクトへのアプローチの一つになれば幸い
 
 ## TDA(Topological Data analysis)とは
 
 位相幾何的な特徴の抽出を狙った分析である  
+従来のstochasticな分析では得られなかった知見が得られれば幸い  
 TDAの基本的なツールとして、persistent homologyやmapperがある  
-今回はpersistent homologyを扱う 
+今回はpersistent homologyのみ扱う 
 
 # persistent homologyとその表現
 
-## 使用データ
-
-ここでは次のような円周一様分布を考える。
-
 
 point cloudの各点を中心とする超球を考える。   
-半径を増やしていったとき、ホモロジーが誕生(Birth)しては消える(Death)ことになる。
+半径を増やしていったとき、ホモロジーが誕生(Birth)しては消える(Death)ことになる。  
 この永続性を見ることをpersistent homologyという
 
-persistent homology は、Birth, Deathの半径によって与えられえることになる。  
+persistent homology は、半径$r$を用いて$Birth(r), Death(r)$によって与えられえることになる。  
 その表現、要約方法が盛んに開発されてきた。
 
 ## persistent diagram
 
 最も基本的なのがpersistent diagram(PD)である。  
-これは横軸にBirth, 縦軸にDeathをとったホモロジーの散布図である。  
+これは横軸に$Birth$, 縦軸に$Death$をとったホモロジーの散布図である。  
 ホモロジーの次元により色を変えるのが一般的であり、可視化手法としては優れている。  
 しかし、PDをもとに主観的な判断を下すことは望ましくない
 
@@ -61,17 +61,36 @@ persistent homology は、Birth, Deathの半径によって与えられえるこ
 
 $$\text{max}(Death(r) - Birth(r))$$
 
-## persistent landscape
+## persistence landscape
 
-PDのさらに要約として、persistent landscapeがよく用いられる。  
+PDのさらに要約として、persistence landscapeがよく用いられる。  
 ノイズを含んだ実データでは、生まれてすぐに死ぬホモロジーが多数存在することになる。  
-より強い永続性を持った
+つまり、より強い永続性を持ったものに着目することが重要であるとかんがえられる。 
 
-## barcode plot
+$p$番目のホモロジーで$Birth(r)=b, Death(r)=d$であったとする。そのとき、次の区分線形関数を考える 
+$$
+\Lambda_p(t) = \cases{
+  t-b, & b < t < (b+d)/2 \\
+  d-t, & (b+d)/2< t < d\\
+  0 & otherwise
+}
+$$
+ここで、persistence landscapeを
+$$
+F(t) = \text{sup}(\Lambda_p(t))
+$$
+で与える。
 
-## persistence integral
+## barcode
 
-## bedi sequence
+ホモロジーが生まれてから死ぬまでを実線で表して並べたものをbarcodeという。   
+ただし、並べ方を決めなくてはならない
+
+## PD間の距離
+
+Wasserstein distanceやbottleneck distanceというPD間の類似性を測る指標が提案されている     
+よくわかっていないので要調査。組み合わせ爆発が起きるので計算が大変らしい  
+
 
 # 時系列へのアプローチ
 
@@ -98,7 +117,7 @@ point cloudさえ作ってしまえばpersistent homologyを計算すること�
 
 ## 時間遅れ座標の単位$\tau$
 
-大きすぎてもいけないし少なすぎてもいけない。
+大きすぎるとサンプルが減るし、少なすぎても特徴が抽出できない場合がある  
 系列の周期の整数倍は用いないほうが良い。  
 自己相関関数を推定し参考にすることもある
 
@@ -109,7 +128,7 @@ point cloudさえ作ってしまえばpersistent homologyを計算すること�
 次のような関数を考える
 
 $$y = 4sin(x)sin(32x) + 4x$$
-```{r}
+```{r pure_data}
 pure <- data.frame(x = seq(0,pi, length = 500)) %>% 
   mutate(y = 4 * sin(x) * sin(32*x) + 4*x) %>% 
   mutate(t1 = lag(y, 1),
@@ -152,49 +171,189 @@ pure %>%
 dev.off()
 ```
 
+$\tau = 20$がいい感じであるように思える。PDを作成すると以下のようになる 
+黒が0次元、赤が1次元、青が2次元のホモロジーを表している
+
+```{r pure_PD, include=T}
+res <- tibble(tau = c(1, 20, 50, 100)) %>% 
+  mutate(data = map(tau,
+                    ~ pure$y)) %>% 
+  mutate(data = map2(data, tau,
+                     ~ tibble(y_1 = .x,
+                              y_2 = lag(.x, .y),
+                              y_3 = lag(.x, .y*2)) %>% 
+                       drop_na() %>% 
+                       as.matrix()),
+         diag = map(data,
+                    ~ alphaDiag(.x) %>% 
+                      do.call("cbind",.) %>% 
+                      as_tibble() %>% 
+                      mutate(dimension = as.factor(dimension)) %>% 
+                      filter(!is.infinite(Death))),
+         tseq = map(diag, 
+                    ~ seq(0,max(.x$Death), by = 0.01)),
+         land_1 = map2(diag, tseq,
+                   ~ landscape(.x, dimension = 1, KK = 1, .y)),
+         land_2 = map2(diag, tseq,
+                   ~ landscape(.x, dimension = 2, KK = 1, .y)))
+
+```
+
+```{r pure_diag_plot, include=T}
+res %>% 
+  select(tau, diag) %>% 
+  unnest() %>% 
+  ggplot(aes(Birth, Death, colour = dimension))+
+  geom_point()+
+  geom_abline()+
+  theme_bw()+
+  facet_grid(~tau)
+```
+
+2次元のホモロジーなら$\tau = 20$、1次元のホモロジーなら$\tau = 100$ではっきりと出ていることが分かる
+
+続いてlandscapeのを示す
+
+```{r pure_land ,include = T}
+res %>% select(tau, tseq, land_2, land_1) %>% 
+  unnest() %>% 
+  gather(dimension, land, -tseq, -tau) %>% 
+  ggplot(aes(tseq, land))+
+  geom_point()+
+  geom_line()+
+  theme_bw()+
+  facet_grid(dimension~tau, scale = "free_y")
+```
+
+$\tau = 1$の場合にはうまく特徴が抽出できていないことが分かる。
+
+
 ### PCA
 
-$\tau = 1$の場合でも、PCAを噛ませることで幾何的情報は取り出せることが示されている。
+$\tau = 1$の場合でも、PCAを噛ませることで幾何的情報（特に2次元のホモロジー）は取り出せることが示される。   
+上のPDと比較されたい
 
 ```{r pure_pca_scatterplot3d, include = T}
-pure %>% 
+pure_pca <- pure %>% 
   select(y, t1, t2) %>% 
   drop_na() %>% 
   prcomp(x=.) %>% 
   .$x %>% 
+  apply(2, scale)
+
+pure_pca %>% 
   scatterplot3d(highlight.3d = T)
 ```
 
-## low noisy data
+
+```{r pure_pca_diag, include=T}
+diag_pca <- pure_pca %>% 
+  alphaDiag() %>% 
+  do.call("cbind",.) %>% 
+  as_tibble() %>% 
+  filter(!is.infinite(Death)) %>% 
+  mutate(dimension = as.factor(dimension))
+
+diag_pca %>% 
+  ggplot(aes(Birth, Death,colour = dimension))+
+  geom_point()+
+  geom_abline()+
+  theme_bw()
+```
+
+
+
+## noisy data
+
+先ほどのデータにノイズを付与する
+
+$$
+y = 4sin(x)sin(32x) + 4x + \varepsilon\\ 
+\varepsilon \sim N(\mu=0, \sigma = 0.5)
+$$
 
 ```{r}
 set.seed(1234)
-low_noisy <- data.frame(x = seq(0,pi, length = 500)) %>% 
+noisy <- data.frame(x = seq(0,pi, length = 500)) %>% 
   mutate(y = 4 * sin(x) * sin(32*x) + 4*x + rnorm(500, mean=0, sd = 0.5)) %>% 
   mutate(t20 = lag(y, 20),
          t40 = lag(y, 40)
          )
 ```
 
-```{r low_noisy_tsplot, include = TRUE}
-low_noisy %>% 
+```{r noisy_tsplot, include = TRUE}
+noisy %>% 
   ggplot(aes(x,y))+
   geom_point()+
   geom_line()+
   theme_bw()
 ```
 
-```{r low_noisy_scatterplot3d, include=TRUE}
-low_noisy %>% 
+```{r noisy_scatterplot3d, include=TRUE}
+noisy %>% 
   select(y,t20,t40) %>% 
   scatterplot3d(highlight.3d = T)
 ```
 
-```{r}
-data <- low_noisy %>% 
+
+```{r noisy_res, include = T}
+noisy_diag <- noisy %>% 
+  select(y, t20, t40) %>% 
   drop_na() %>% 
-  select(-x) %>% 
-  as.matrix()
-alphaDiag(data)
+  as.matrix() %>% 
+  alphaDiag() %>% 
+  do.call("cbind",.) %>% 
+  as_tibble() %>% 
+  mutate(dimension = as.factor(dimension)) %>% 
+  filter(!is.infinite(Death))
+
+noisy_diag %>% 
+  ggplot(aes(Birth, Death, colour = dimension))+
+  geom_point()
+
+
+noisy_diag %>% 
+  landscape(dimension = 1, KK = 1) %>% 
+  plot()
 ```
+
+
+### smoothing
+
+移動平均を考えることでsmoothingをかける   
+ここでは移動平均の窓の長さを10とした
+
+```{r smooth, include = T}
+smooth <- noisy %>% 
+  select(-x) %>% 
+  apply(2, function(x) roll_mean(x, n=10L)) %>% 
+  as_tibble() %>% 
+  drop_na()
+
+scatterplot3d(smooth, highlight.3d = T)
+```
+
+MAによりノイズを低減することができた。    
+ノイズの入っていないときのPDと比較されたい    
+ただしlandscapeを考える場合、弱い永続性を持つホモロジーは潰されてしまうので、ノイズの幾何的情報が見れなくなってしまうとも考えられる。
+
+```{r smooth_res, include = T}
+smooth_diag <- smooth %>% 
+  as.matrix() %>% 
+  alphaDiag() %>% 
+  do.call("cbind",.) %>% 
+  as_tibble() %>% 
+  mutate(dimension = as.factor(dimension)) %>% 
+  filter(!is.infinite(Death))
+
+smooth_diag %>% 
+  ggplot(aes(Birth, Death, colour = dimension))+
+  geom_point()
+
+
+smooth_diag %>% 
+  landscape(dimension = 1, KK = 1) %>% 
+  plot()
+```
+
 
