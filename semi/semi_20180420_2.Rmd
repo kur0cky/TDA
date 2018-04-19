@@ -1,0 +1,152 @@
+---
+title: "ov1"
+author: "Yutaka Kuroki"
+date: "2018年4月16日"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r}
+library(tidyverse)
+library(TDA)
+library(lubridate)
+library(rgl)
+
+```
+
+# はじめに
+
+何が目的かよく分からなくなってきた。
+
+# data
+
+```{r}
+b.lf <- list.files("data/raw/before")
+a.lf <- list.files("data/raw/after")
+names <- tibble(names = a.lf) %>% 
+  semi_join(tibble(b.lf), by=c("names"="b.lf")) %>% 
+  .$names
+```
+
+```{r}
+tmp_b <- tibble(name = names[1:10]) %>% 
+  mutate(data = map(name, 
+                    ~ .x %>% 
+                      str_c("data/raw/before/", .) %>% 
+                      read_csv(skip = 71, n_max = 5000, col_names = FALSE) %>% 
+                      # slice(1:1000 *5) %>% 
+                      transmute(dttm = as_datetime(X1),
+                                micro = microseconds(as.integer(X2)),
+                                value = X3)),
+         type = "before")
+tmp_a <- tibble(name = names[1:10]) %>% 
+  mutate(data = map(name, 
+                    ~ .x %>% 
+                      str_c("data/raw/after/", .) %>% 
+                      read_csv(skip = 71, n_max = 5000, col_names = FALSE) %>% 
+                      # slice(1:1000 * 5) %>% 
+                      transmute(dttm = as_datetime(X1),
+                                micro = microseconds(as.integer(X2)),
+                                value = X3)),
+         type = "after")
+tmp <- bind_rows(tmp_b, tmp_a) %>% 
+  unnest()
+```
+
+
+```{r}
+tmp2 <- tmp %>% 
+  group_by(name, type) %>% 
+  arrange(dttm, micro) %>% 
+  mutate(index = 1:n()) %>% 
+  ungroup()
+
+
+tmp2 %>% 
+  ggplot(aes(index, value))+
+  geom_line()+
+  facet_grid(name~type)
+
+```
+
+# TDA
+
+## PCA
+
+```{r}
+tmp3 <- tmp2 %>% 
+  group_by(name, type) %>% 
+  nest() %>% 
+  mutate(data = map(data,
+                    ~ .x %>% 
+                      select(index, y = value) %>% 
+                      mutate(y1 = lag(y, 1),
+                             y2 = lag(y, 2),
+                             y3 = lag(y, 3),
+                             y4 = lag(y, 4),
+                             y5 = lag(y, 5),
+                             y6 = lag(y, 6))))
+
+tmp4 <- tmp3 %>% 
+  mutate(pca = map(data,
+                   ~ .x %>% 
+                     select(-index) %>% 
+                     drop_na() %>% 
+                     as.matrix() %>% 
+                     prcomp),
+         rotate = map(pca,
+                      ~ .x$x))
+```
+
+```{r}
+tmp5 <- tmp4$rotate[[2]][,1:3] %>% 
+  apply(2,scale)
+  
+
+```
+
+## TDA
+
+```{r}
+tmp5 <- tmp4 %>% 
+  mutate(diagram = map(rotate,
+                       ~ .x[,1:3] %>% 
+                         apply(2, scale) %>% 
+                         alphaDiag()))
+
+tmp6 <- tmp5 %>% 
+  mutate(diagram = map(diagram,
+                       ~ .x["diagram"] %>% 
+                         do.call("cbind",.) %>% 
+                         as_tibble() %>% 
+                         filter(is.finite(.$Death)) %>% 
+                         as.matrix()))
+
+tmp7 <- tmp6 %>% 
+  mutate(land_seq = map(diagram,
+                        ~ .x[,"Death"] %>% 
+                          max() %>% 
+                          seq(0,.,length=500)))
+tmp8 <- tmp7 %>% 
+  mutate(land = map2(diagram, land_seq,
+                     ~ landscape(.x, dimension = 1, KK = 1, tseq = seq(0,1,length=1000))))
+```
+
+
+
+```{r}
+landscape <- tmp8 %>% 
+  mutate(land = map2(land, land_seq,
+                     ~ tibble(landscape = .x[,1], tseq = seq(0,1,length=1000)))) %>% 
+  select(name, type, land) %>% 
+  unnest()
+
+landscape %>% 
+  ggplot(aes(tseq, landscape, colour = type))+
+  geom_point(alpha=0.3)+
+  theme_bw()+
+  facet_wrap(~type, nrow=2)
+```
+
