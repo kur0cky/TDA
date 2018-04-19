@@ -40,13 +40,6 @@ TDAの基本的なツールとして、persistent homologyやmapperがある
 
 ここでは次のような円周一様分布を考える。
 
-```{r circular, include = TRUE}
-set.seed(1234)
-circ <- circleUnif(200)
-plot(circ)
-Diag <- alphaDiag(circ) 
-```
-
 
 point cloudの各点を中心とする超球を考える。   
 半径を増やしていったとき、ホモロジーが誕生(Birth)しては消える(Death)ことになる。
@@ -62,9 +55,6 @@ persistent homology は、Birth, Deathの半径によって与えられえるこ
 ホモロジーの次元により色を変えるのが一般的であり、可視化手法としては優れている。  
 しかし、PDをもとに主観的な判断を下すことは望ましくない
 
-```{r PD}
-plot(Diag[["diagram"]])
-```
 
 
 ## maximum persistetnce
@@ -139,7 +129,8 @@ pure %>%
   theme_bw()
 ```
 
-時間遅れ単位$\tau$を1, 20, 50, 100と変え3次元に埋め込んだ結果を次に示す
+時間遅れ単位$\tau$を1, 20, 50, 100と変え3次元に埋め込んだ結果を次に示す 
+
 
 ```{r pure_scatterplot3d, include=TRUE}
 par(mfcol = c(2,2))
@@ -198,3 +189,12 @@ low_noisy %>%
   select(y,t20,t40) %>% 
   scatterplot3d(highlight.3d = T)
 ```
+
+```{r}
+data <- low_noisy %>% 
+  drop_na() %>% 
+  select(-x) %>% 
+  as.matrix()
+alphaDiag(data)
+```
+
