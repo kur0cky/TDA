@@ -81,10 +81,16 @@ F(t) = \text{sup}(\Lambda_p(t))
 $$
 で与える。
 
-## barcode
+## persustent barcode
 
-ホモロジーが生まれてから死ぬまでを実線で表して並べたものをbarcodeという。   
+ホモロジーが生まれてから死ぬまでを実線で表して並べたものをpersistent barcodeという。   
 ただし、並べ方を決めなくてはならない
+
+## betti sequence
+
+
+
+barcode
 
 ## PD間の距離
 
@@ -227,6 +233,21 @@ res %>% select(tau, tseq, land_2, land_1) %>%
 
 $\tau = 1$の場合にはうまく特徴が抽出できていないことが分かる。
 
+続けてbarcode 
+
+```{r pure_barcode, include = T}
+res %>% 
+  select(tau, diag) %>% 
+  unnest() %>% 
+  arrange(Birth, Death) %>% 
+  group_by(dimension) %>% 
+  mutate(index = seq(0,1, length = n())) %>% 
+  ggplot(aes(y = index))+
+  geom_segment(aes(x = Birth, xend = Death, yend = index))+
+  theme_bw()+
+  facet_wrap(~dimension)
+```
+
 
 ### PCA
 
@@ -309,6 +330,7 @@ noisy_diag <- noisy %>%
 
 noisy_diag %>% 
   ggplot(aes(Birth, Death, colour = dimension))+
+  theme_bw()+
   geom_point()
 
 
@@ -348,7 +370,8 @@ smooth_diag <- smooth %>%
 
 smooth_diag %>% 
   ggplot(aes(Birth, Death, colour = dimension))+
-  geom_point()
+  geom_point()+
+  theme_bw()
 
 
 smooth_diag %>% 
@@ -357,3 +380,8 @@ smooth_diag %>%
 ```
 
 
+# 参考文献
+
+- Truong, P. (2017). An exploration of topological properties of high-frequency one-dimensional financial time series data using TDA (Dissertation). Retrieved from http://urn.kb.se/resolve?urn=urn:nbn:se:kth:diva-220355
+- Fasy, Brittany & Kim, Jisu & Lecci, Fabrizio & Maria, Clément. (2014). Introduction to the R package TDA. 
+- Yuhei Umeda, Time Series Classification via Topological Data Analysis, 人工知能学会論文誌, 公開日 2017/05/01, Online ISSN 1346-8030, Print ISSN 1346-0714, https://doi.org/10.1527/tjsai.D-G72, https://www.jstage.jst.go.jp/article/tjsai/32/3/32_D-G72/_article/-char/ja
