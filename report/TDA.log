@@ -1,0 +1,37 @@
+This is e-pTeX, Version 3.14159265-p3.7.1-161114-2.6 (utf8.euc) (TeX Live 2017) (preloaded format=platex 2018.4.20)  30 APR 2018 15:23
+entering extended mode
+ restricted \write18 enabled.
+ file:line:error style messages enabled.
+ %&-line parsing enabled.
+**TDA.bib
+(./TDA.bib
+pLaTeX2e <2017/10/28>+4 (based on LaTeX2e <2017-04-15>)
+Babel <3.18> and hyphenation patterns for 84 language(s) loaded.
+
+./TDA.bib:2: LaTeX Error: Missing \begin{document}.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.2 @
+     article{Seversky2016OnTT,
+? 
+./TDA.bib:2: Emergency stop.
+ ...                                              
+                                                  
+l.2 @
+     article{Seversky2016OnTT,
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+ 
+Here is how much of TeX's memory you used:
+ 6 strings out of 493640
+ 163 string characters out of 6148698
+ 54770 words of memory out of 5000000
+ 3703 multiletter control sequences out of 15000+600000
+ 7511 words of font info for 31 fonts, out of 8000000 for 9000
+ 929 hyphenation exceptions out of 8191
+ 5i,0n,4p,70b,14s stack positions out of 5000i,500n,10000p,200000b,80000s
+No pages of output.

@@ -30,6 +30,8 @@ data <- read_csv("data/Bloomberg/assets.csv") %>%
   mutate(Date = as_date(Date))
 ```
 
+# toyota
+
 ```{r toyota}
 toyota <- data %>% 
   filter(str_detect(.$ticker, "7230")) %>% 
@@ -45,7 +47,6 @@ toyota <- data %>%
 ```
 
 
-# はじめに
 
 去年使った株価データにの位相幾何的な性質を見たい    
 TOPIXを構成する約2000銘柄は多すぎるため、とりあえず代表的なトヨタあたりを
@@ -135,10 +136,24 @@ diags <- data %>%
          ret_3 = lag(ret, 3),
          ret_4 = lag(ret, 4)) %>% 
   drop_na() %>% 
-  select(ticker, ret_1:ret_4) %>% 
+  select(ticker, Date, ret, ret_1:ret_4) %>% 
   group_by(ticker) %>% 
   nest() %>% 
-  mutate(diag = map(data, 
+  mutate(train = map(data,
+                     ~ .x %>% 
+                       filter(Date < as_date("2017-05-01"))),
+         test = map(data,
+                    ~ .x %>% 
+                      filter(Date >= as_date("2017-05-01")))) %>% 
+  mutate(train = map(train, 
+                     ~ .x %>% 
+                       select(-Date) %>% 
+                       as.matrix()),
+         test = map_dbl(test,
+                    ~ .x$ret %>% 
+                      sum() %>% 
+                      exp()-1)) %>% 
+  mutate(diag = map(train, 
                     ~ alphaDiag(.x) %>% 
                       do.call("cbind",.) %>% 
                       as_tibble()))

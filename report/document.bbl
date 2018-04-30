@@ -1,0 +1,21 @@
+\begin{thebibliography}{1}
+
+\bibitem{Truong2017}
+Patrick Truong.
+\newblock An exploration of topological properties of high-frequency
+  one-dimensional financial time series data using tda.
+\newblock Master's thesis, KTH, Mathematical Statistics, 2017.
+
+\bibitem{Turner2014}
+Katharine Turner, Yuriy Mileyko, Sayan Mukherjee, and John Harer.
+\newblock Fr{\'e}chet means for distributions of persistence diagrams.
+\newblock {\em Discrete \& Computational Geometry}, Vol.~52, No.~1, pp. 44--70,
+  Jul 2014.
+
+\bibitem{Bubenik2015}
+Peter Bubenik.
+\newblock Statistical topological data analysis using persistence landscapes.
+\newblock {\em Journal of Machine Learning Research}, Vol.~16, pp. 77--102,
+  2015.
+
+\end{thebibliography}

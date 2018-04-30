@@ -34,7 +34,6 @@ mazdaデータに対してTDAやってみる。
 例として一つのロボットアームを取り上げる
 
 ```{r import_mames}
-setwd("..")
 b.lf <- list.files("data/mazda/before")
 a.lf <- list.files("data/mazda/after")
 names <- tibble(names = a.lf) %>% 
@@ -43,8 +42,7 @@ names <- tibble(names = a.lf) %>%
 ```
 
 ```{r import_data}
-setwd("..")
-tmp_b <- tibble(name = names[1:10]) %>% 
+tmp_b <- tibble(name = names) %>% 
   mutate(data = map(name, 
                     ~ .x %>% 
                       str_c("data/mazda/before/", .) %>% 
@@ -54,7 +52,7 @@ tmp_b <- tibble(name = names[1:10]) %>%
                                 micro = microseconds(as.integer(X2)),
                                 value = X3)),
          type = "before")
-tmp_a <- tibble(name = names[1:10]) %>% 
+tmp_a <- tibble(name = names) %>% 
   mutate(data = map(name, 
                     ~ .x %>% 
                       str_c("data/mazda/after/", .) %>% 
