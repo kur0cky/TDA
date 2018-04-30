@@ -1,0 +1,74 @@
+---
+title: "data"
+author: "Yutaka Kuroki"
+date: "2018/4/30"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r}
+library(tidyverse)
+library(TDA)
+library(lubridate)
+```
+
+
+
+```{r import_mames}
+b.lf <- list.files("data/mazda/before")
+a.lf <- list.files("data/mazda/after")
+names <- tibble(names = a.lf) %>% 
+  semi_join(tibble(b.lf), by=c("names"="b.lf")) %>% 
+  .$names
+```
+
+```{r import_data}
+tmp_b <- tibble(name = names) %>% 
+  mutate(data = map(name, 
+                    ~ .x %>% 
+                      str_c("data/mazda/before/", .) %>% 
+                      read_csv(skip = 71, n_max = 5000, col_names = FALSE) %>% 
+                      # slice(1:1000 *5) %>% 
+                      transmute(dttm = as_datetime(X1),
+                                micro = microseconds(as.integer(X2)),
+                                value = X3)),
+         type = "before")
+tmp_a <- tibble(name = names) %>% 
+  mutate(data = map(name, 
+                    ~ .x %>% 
+                      str_c("data/mazda/after/", .) %>% 
+                      read_csv(skip = 71, n_max = 5000, col_names = FALSE) %>% 
+                      # slice(1:1000 * 5) %>% 
+                      transmute(dttm = as_datetime(X1),
+                                micro = microseconds(as.integer(X2)),
+                                value = X3)),
+         type = "after")
+data.tmp <- bind_rows(tmp_b, tmp_a) %>% 
+  unnest() %>% 
+  group_by(name, type) %>% 
+  arrange(dttm, micro) %>% 
+  mutate(index = 1:n()) %>% 
+  ungroup()
+
+data.tmp2 <- data.tmp %>% 
+  mutate(name = map(name, 
+                    ~str_split(.x, pattern = "-") %>% 
+                      unlist()))
+data.tmp3 <- data.tmp2 %>% 
+  mutate(number = map_dbl(name,
+                          ~ rev(.x)[1] %>% 
+                            parse_number()),
+         name = map_chr(name,
+                    ~ rev(.x)[-1] %>% 
+                      rev() %>% 
+                      str_flatten()))
+data <- data.tmp3
+```
+
+```{r write_csv}
+data %>% 
+  write_csv("data/mazda/processed/data.csv")
+```
+

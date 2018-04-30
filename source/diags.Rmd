@@ -1,0 +1,82 @@
+---
+title: "persistence diagrams based on alpha complex"
+author: "Yutaka Kuroki"
+date: "2018/4/30"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r library}
+library(tidyverse)
+library(TDA)
+library(lubridate)
+```
+
+
+```{r data_import}
+data <- read_csv("data/mazda/processed/data.csv")
+```
+
+```{r}
+embed <- data %>% 
+  group_by(name, number, type) %>% 
+  mutate(value = scale(value)) %>% 
+  rename(y = value) %>% 
+  mutate(y1 = lag(y, 1),
+         y2 = lag(y, 2),
+         y3 = lag(y, 3),
+         y4 = lag(y, 4),
+         y5 = lag(y, 5),
+         y6 = lag(y, 6)) %>% 
+  drop_na() %>% 
+  ungroup()
+```
+
+```{r}
+embed %>% 
+  write_csv("data/mazda/processed/embed.csv")
+```
+
+```{r}
+PC <- embed %>% 
+  group_by(name, number, type) %>% 
+  nest() %>% 
+  mutate(PC = map(data,
+                  ~.x %>% 
+                    select(y, y1, y2, y3, y4, y5, y6) %>% 
+                    as.matrix() %>% 
+                    prcomp() %>% 
+                    .$x %>% 
+                    as_tibble() %>% 
+                    mutate(index = 1:nrow(.x)))) %>% 
+  select(name, number, type, PC) %>% 
+  unnest()
+```
+
+```{r}
+PC %>% 
+  write_csv("data/mazda/processed/PC.csv")
+```
+
+```{r}
+diags <- PC %>% 
+  select(name, number, type, PC1, PC2, PC3) %>% 
+  group_by(name, number, type) %>% 
+  nest() %>% 
+  mutate(data = map(data, ~as.matrix(.x)),
+         diag = map(data, ~ alphaDiag(.x)))
+
+```
+
+```{r}
+diags %>% 
+  mutate(diag = map(diag, 
+                    ~do.call("cbind", .) %>% 
+                      as_tibble())) %>% 
+  select(name, number, type, diag) %>% 
+  unnest() %>% 
+  filter(is.finite(Death)) %>% 
+  write_csv("data/mazda/processed/diags.csv")
+```
+

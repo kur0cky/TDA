@@ -1,0 +1,88 @@
+---
+title: "plot_figs"
+author: "Yutaka Kuroki"
+date: "2018/4/30"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(TDA)
+```
+
+```{r data_import}
+data <- read_csv("data/mazda/processed/data.csv")
+```
+
+
+# ts
+
+```{r}
+data %>% 
+  filter(number == 1) %>% 
+  ggplot(aes(index, value))+
+  geom_line(size=0.2)+
+  theme_bw()+
+  facet_grid(name ~ type, scales = "free_y")+
+  theme(text = element_text(size=5))
+
+data %>% 
+  mutate(index = index + (number-1)*5000) %>% 
+  ggplot(aes(index, value))+
+  geom_line(size=0.2)+
+  theme_bw()+
+  facet_grid(name ~ type, scales = "free_y")+
+  theme(text = element_text(size=5))
+
+ggsave("report/fig/ts.png",
+       height = 12,
+       width = 8,
+       units = "cm")
+```
+
+# diags
+
+```{r}
+diags <- read_csv("data/mazda/processed/diags.csv",col_types = c("cicidd"))
+diags
+plots <- list()
+for(i in 1:15){
+   plots[[i]] <- diags %>% 
+                   group_by(name) %>% 
+                   nest() %>% 
+                   .$data %>% 
+                   .[[i]] %>% 
+                   mutate(dimension = as.factor(dimension)) %>% 
+                   ggplot(aes(Birth, Death, colour = dimension))+
+                   geom_point(alpha=0.4, size=0.4)+
+                   theme_bw()+
+                   facet_grid(number~type)+
+                   theme(text = element_text(size=5))
+  
+  ggsave(plot = plots[[i]],
+         str_c("report/fig/diag_", i, ".png"),
+         units = "cm",
+         height = 12,
+         width = 9)
+}
+```
+
+# barcode
+
+```{r}
+diags %>% 
+  gather(DB, radius, -name, -number, -type, -dimension) %>% 
+  group_by(name, number, type, dimension) %>% 
+  arrange(radius) %>% 
+  mutate(tmp = if_else(DB == "Birth", 1, -1),
+         tmp2 = cumsum(tmp)) %>% 
+  filter(name == "B3ﾌﾀﾓﾉM478pro71", dimension == 1 ) %>% 
+  ggplot(aes(radius, tmp2))+
+  geom_line()+
+  facet_grid(number~ type)
+
+```
+
