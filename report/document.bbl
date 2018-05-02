@@ -1,5 +1,11 @@
 \begin{thebibliography}{1}
 
+\bibitem{Edelsbrunner2002}
+Edelsbrunner, Letscher, and Zomorodian.
+\newblock Topological persistence and simplification.
+\newblock {\em Discrete \& Computational Geometry}, Vol.~28, No.~4, pp.
+  511--533, Nov 2002.
+
 \bibitem{Truong2017}
 Patrick Truong.
 \newblock An exploration of topological properties of high-frequency

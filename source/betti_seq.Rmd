@@ -1,0 +1,57 @@
+---
+title: "betti_seq"
+author: "Yutaka Kuroki"
+date: "2018年5月2日"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(dtw)
+library(imputeTS)
+```
+
+```{r}
+betti <- read_csv("data/mazda/processed/betti.csv")
+```
+
+```{r}
+tmp2 <- expand.grid(radius = seq(0, 3, length=100),
+            name = unique(betti$name),
+            number = unique(betti$number),
+            type = unique(betti$type),
+            dimension = unique(betti$dimension),
+            seq=1) %>% 
+  mutate(name = as.character(name),
+         type = as.character(type)) %>% 
+  as_tibble() %>% 
+  bind_rows(betti) %>% 
+  group_by(name, number, type, dimension) %>% 
+  nest()
+
+tmp3 <- tmp2 %>% 
+  mutate(data = map(data,
+                    ~ .x %>%
+                      arrange(radius, seq, Betti) %>% 
+                      mutate(Betti = imputeTS::na.locf(.x$Betti,option="locf")))) %>% 
+  unnest() %>% 
+  filter(seq == 1) %>% 
+  select(-seq)
+
+tmp4 <- tmp3 %>% 
+  group_by(name, number, type, dimension) %>% 
+  nest()
+```
+
+```{r}
+betti_seq <- tmp4 %>% 
+  unnest()
+```
+
+```{r}
+betti_seq %>% 
+  write_csv("data/mazda/processed/betti_seq.csv")
+```
+

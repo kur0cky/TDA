@@ -1,0 +1,37 @@
+---
+title: "betti sequence"
+author: "Yutaka Kuroki"
+date: "2018年4月30日"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r}
+library(tidyverse)
+library(TDA)
+library(lubridate)
+```
+
+```{r}
+diags <- read_csv("data/mazda/processed/diags.csv",col_types = c("cicidd"))
+```
+
+```{r}
+betti <- diags %>% 
+  gather(DB, radius, -name, -number, -type, -dimension) %>% 
+  group_by(name, number, type, dimension) %>% 
+  arrange(radius) %>% 
+  mutate(tmp = if_else(DB == "Birth", 1, -1),
+         Betti = cumsum(tmp)) %>% 
+  group_by(name, number, type, dimension, radius) %>% 
+  summarise(Betti = max(Betti)) %>% 
+  ungroup()
+```
+
+```{r}
+betti %>% 
+  write_csv("data/mazda/processed/betti.csv")
+```
+
