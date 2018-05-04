@@ -1,10 +1,15 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
-\bibitem{Singh2007}
-Gurjeet Singh, Facundo M{\'e}moli, and Gunnar~E. Carlsson.
-\newblock Topological methods for the analysis of high dimensional data sets
-  and 3d object recognition.
-\newblock In {\em SPBG}, 2007.
+\bibitem{Berndt1996}
+Donald Berndt and James Clifford.
+\newblock Finding patterns in time series: a dynamic programming approach.
+\newblock pp. 229--248, 02 1996.
+
+\bibitem{Chouakria2007}
+Ahlame~Douzal Chouakria and Panduranga~Naidu Nagabhushan.
+\newblock Adaptive dissimilarity index for measuring time series proximity.
+\newblock {\em Advances in Data Analysis and Classification}, Vol.~1, No.~1,
+  pp. 5--21, Mar 2007.
 
 \bibitem{Edelsbrunner2002}
 Edelsbrunner, Letscher, and Zomorodian.
@@ -12,10 +17,27 @@ Edelsbrunner, Letscher, and Zomorodian.
 \newblock {\em Discrete \& Computational Geometry}, Vol.~28, No.~4, pp.
   511--533, Nov 2002.
 
+\bibitem{Otter2017}
+Nina Otter, Mason~A. Porter, Ulrike Tillmann, Peter Grindrod, and Heather~A.
+  Harrington.
+\newblock A roadmap for the computation of persistent homology.
+\newblock {\em EPJ Data Science}, Vol.~6, No.~1, p.~17, Aug 2017.
+
+\bibitem{Mileyko2011}
+Yuriy Mileyko, Sayan Mukherjee, and John Harer.
+\newblock Probability measures on the space of persistence diagrams.
+\newblock {\em Inverse Problems}, Vol.~27, No.~12, p. 124007, 2011.
+
 \bibitem{Umeda2017}
 Yuhei Umeda.
 \newblock Time series classification via topological data analysis.
 \newblock 人工知能学会論文誌, Vol.~32, No.~3, pp. 1--12, 2017.
+
+\bibitem{Singh2007}
+Gurjeet Singh, Facundo M{\'e}moli, and Gunnar~E. Carlsson.
+\newblock Topological methods for the analysis of high dimensional data sets
+  and 3d object recognition.
+\newblock In {\em SPBG}, 2007.
 
 \bibitem{Amenta2007}
 Nina Amenta, Dominique Attali, and Olivier Devillers.
@@ -35,22 +57,5 @@ Patrick Truong.
 \newblock An exploration of topological properties of high-frequency
   one-dimensional financial time series data using tda.
 \newblock Master's thesis, KTH, Mathematical Statistics, 2017.
-
-\bibitem{Berndt1996}
-Donald Berndt and James Clifford.
-\newblock Finding patterns in time series: a dynamic programming approach.
-\newblock pp. 229--248, 02 1996.
-
-\bibitem{Turner2014}
-Katharine Turner, Yuriy Mileyko, Sayan Mukherjee, and John Harer.
-\newblock Fr{\'e}chet means for distributions of persistence diagrams.
-\newblock {\em Discrete \& Computational Geometry}, Vol.~52, No.~1, pp. 44--70,
-  Jul 2014.
-
-\bibitem{Bubenik2015}
-Peter Bubenik.
-\newblock Statistical topological data analysis using persistence landscapes.
-\newblock {\em Journal of Machine Learning Research}, Vol.~16, pp. 77--102,
-  2015.
 
 \end{thebibliography}

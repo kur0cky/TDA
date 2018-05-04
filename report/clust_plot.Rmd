@@ -19,10 +19,12 @@ clust <- readRDS("data/mazda/processed/clust.RDS")
 ```{r}
 plots <- list()
 for(i in 1:15){
-  plots[[i]] <- ggdendrogram(data$clust[[i]], rotate=FALSE)+
+  plots[[i]] <- ggdendrogram(clust$clust[[i]], rotate=FALSE)+
     theme_classic()+
     labs(y = "DTW", x="")+
-     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0))
+    labs(title = clust$name[i])+
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust=0),
+          text = element_text(size = 7))
   
   ggsave(plot = plots[[i]],
        str_c("report/fig/dendro_", i, ".png"),
