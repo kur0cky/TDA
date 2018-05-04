@@ -1,0 +1,49 @@
+---
+title: "betti_plot"
+author: "Yutaka Kuroki"
+date: "2018年5月3日"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+betti <- read_csv("data/mazda/processed/betti_seq.csv")
+```
+
+
+
+```{r}
+betti %>%
+  filter(dimension==1) %>% 
+  ggplot(aes(radius, Betti, group=number))+
+  geom_line(size=0.3)+
+  facet_grid(name ~ type, scales="free_y")+
+  theme_bw()+
+  theme(text = element_text(size=5))
+
+ggsave("report/fig/betti_1.png",
+       height = 12,
+       width = 8,
+       units = "cm")
+```
+
+```{r}
+betti %>% 
+  filter(dimension == 2) %>% 
+  ggplot(aes(radius, Betti, group=number))+
+  geom_line(size=0.3)+
+  facet_grid(name ~ type, scales="free_y")+
+  theme_bw()+
+  theme(text = element_text(size=5))
+
+ggsave("report/fig/betti_2.png",
+       height = 12,
+       width = 8,
+       units = "cm")
+```
+

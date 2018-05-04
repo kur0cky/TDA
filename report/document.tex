@@ -5,6 +5,7 @@
 \usepackage[dvipdfmx]{graphicx}
 \usepackage{here}
 \usepackage{amsmath}
+\usepackage{amsfonts}
 \bibliographystyle{junsrt} %参考文献出力スタイル
 
 
@@ -34,8 +35,8 @@ Mより提供されたデータは一つのロボットアームにつき，減�
 
 クラスタ分析では，クラスタリングされる対象間の類似度もしくは非類似度が必要である．
 時系列を対象としたクラスタリングにおいて，最も広く使用されている尺度はユークリッド距離，Dynamic Time Warping(DTW)，CORTなどである．
-DTWは2つ時系列データの時刻をt1, t2とすると，t1,t2全ての組の誤差を計算し，それらの合計が最小になるような経路を求めるアルゴリズムである．
-DTWにより計測開始時点が異なる問題は多少解決されるが，振動の主な挙動はアームによって異なるため，減速機交換前後の差異はクラスタリングの結果に表れない．
+DTWは2つ時系列データの時刻を$t_1$, $t_2$とすると，$t_1,t_2$全ての組の誤差を計算し，それらの合計が最小になるような経路を求めるアルゴリズムである．
+DTWにより挙動の計測開始時点が異なる問題は多少解決されるが，振動の主な挙動はアームによって異なるため，減速機交換前後の差異はクラスタリングの結果に表れない．
 また，未知音源分離で用いられる独立成分分析(ICA)は主要な振動と微細な振動を分けることを可能にするかもしれないが，同時点の複数観測を必要とするため本データには適用することはできない．
 つまり時系列の同時性を利用することなく，かつアームごとに異なる主要な振動に影響されない特徴量によって教師無し学習を行うことが課題である．
 
@@ -49,20 +50,71 @@ DTWにより計測開始時点が異なる問題は多少解決されるが，�
 まず2節では本調査で使用したTDAの手法やクラスタリング手法について述べ，3節では実際のデータ解析とその結果を示す．
 4節では考察を行うと共に今後の展望について触れる．
 
-\section{Topological Data Analysis(TDA)}
-TDAはトポロジーを用いてデータの情報を抽出する手法であり，主要なテクニックはmapperとpersistent homologyである．
+\section{Topological Data Analysis(TDA) と時系列クラスタリング}
+トポロジーを用いてデータの情報を抽出するものであり，その主要な手法はmapper\cite{Singh2007}とパーシステント・ホモロジー\cite{Edelsbrunner2002}である．
 これらはノイズを含む複雑なデータセットから何か新たな知見を得る目的でしばしば用いられてきた．
-本調査ではpersistent homologyを利用する．
+本調査ではパーシステント・ホモロジーを利用する．
 
 \subsection{パーシステント・ホモロジー}
-距離空間$(M, d_M)$の有限点集合を$X$，$X$を中心とした半径$r$の級の和集合を$B(X;r):=\bigcup_{i=1}^n B(x_i;r)$とする．ただし，$B(x;r) = \{B(X;r)\}_{r\geq 0 }$とする．
-級の和集合を半径パラメータ$r$で集めた集合$B(X):=\{B(X;r)\}_{r\geq 0}$をここでは$X$のフィルトレーションという．$r\leq q$ならば包含関係$B(X;r)\in B(X;q)$
+距離空間$(M, d_M)$の有限点集合を$X$，$X$を中心とした半径$r$の級の和集合を$B(X;r):=\bigcup_{i=1}^n B(x_i;r)$とする．
+ただし，$B(x;r) =\{y \in M | d_M(x,y) \leq r\}$とする．
+級の和集合を半径パラメータ$r$で集めた集合$\mathbb B(X):=\{B(X;r)\}_{r\geq 0}$をここでは$X$のフィルトレーションという．
+$r\leq a$ならば包含関係$B(X;r)\subset B(X;a)$があるため、ホモロジー群間の射$u_r^a : H_q(B(X;r))\rightarrow H_q(B(X;a)) $を包含写像から誘導する。
+このとき、ホモロジー群の系列
+$$
+H_q(\mathbb B(X)):\dots\rightarrow H_q(B(X;r))\overset{u_a^b}{\rightarrow} H_q(B(X;a))\rightarrow\dots (r\leq a)
+$$
+を$X$の$q$次元パーシステントホモロジーという。
+パーシステントホモロジー体係数多項式環や$A_n$型箙の表現などの言葉で解釈することが出来、分解定理により適切な区間表現$\mathbb I[b_i, d_i] $を通じて
+$$
+H_q(\mathbb B(X))\cong\oplus\mathbb I[b_i,d_i] (b_i\leq d_i)
+$$
+と分解される。これをユークリッド空間$\mathbf R^2$内に表示した多重集合
+$$
+D_q(X):= \{(b_i,d_i) | i \in I\}
+$$
+を$X$の$q$次元パーシステント・ダイアグラムという。
+パーシステント・ダイアグラムの元$(b_i, d_i)$はホモロジーの生成元の発生時間(Birth time)を$b_i$、消滅時間(Death time)を$d_i$と記録しているものと解釈できる。
+
+$q$次のパーシステント・ダイアグラムは2次元の散布図として表され、その解釈や扱いが困難である。
+そのため、様々なダイアグラムの要約が提案されてきた。
+最も単純なものが最大パーシステンスであり、$\text{max}_i(b_i - d_i)$
+で表される。
+
+\subsection{パーシステント・バーコード}
+前節で定義したダイアグラム$D_q(X)$のホモロジー$i$に対して、次の$s_i(r)$を定義する。
+$$
+s_i(r) = 
+\begin{cases}
+1 & (b_i \leq r \leq d_i)\\
+0 & otherwise
+\end{cases}
+$$
+$s_i(r)$を並べてプロットしたものをパーシステント・バーコードという。
+
+また、\cite{Umeda2017}はバーコードを単純に扱い、機械学習の枠組みで扱いやすくするために次で提案されるBetti sequence$BS(X)$を提案している。
+$$
+BS(X) = \sum_i s_i(r)
+$$
+Betti sequenceは半径$r$のときにいくつのホモロジーが存在しているかを表す1次元の系列となる。
+
+\subsection{1次元時系列データに対するTDA}
+時系列から複数次元の有限点集合を構成する方法として、遅れ時間座標を利用した埋め込み(embedding)がある。
+埋め込みはアトラクタを再構成するために非線形ダイナミカルシステムの分野で盛んに利用されている。
+長さ$N$の時系列$x_1, x_2, \dots , x_T$から適当な遅れ時間$\tau$ごとの$d$個の測定値を取り出し$V(t) = (x(t), x(t+\tau), \dots, x(t + d - 1)),\ (t = 1,2,\dots, T)$の$d$次元有限点集合を得る。
+この有限点集合が元の$k$次元力学系の埋め込みになるための十分条件として、$d\geq 2k+1$（ターケンスの埋め込み定理）が知られている。
+
+また、有限点集合の次元$d$が大きくなったときに$\mathbb R^d$の$n$個の点集合のドロネー三角形分割の計算量は$\mathcal O(n^{\frac{[d]}{2}})$になりうる\cite{Amenta2007}, \cite{Attali2003}。
+そこで、位相情報を保持しながら計算を簡略化するため、十分多次元に埋め込んだ後主成分分析により3次元に次元削減するアプローチが提案されている\cite{Truong2017}。
+
+
+\subsection{時系列クラスタリング}
+時系列間の非類似度を算出する際、用いられているのが\cite{Berndt1996}で提案されたDynamic Time Warping(DTW)である。
+DTWは三角不等式を満たさないため距離ではないが、比較的少ない計算量で要素数の異なる系列同士の距離のような量を求める手法である。
 
 
 
 
-
-TDAにおいて主要な技術となるのがPersistent Homology\cite{Edelsbrunner2002}である．
 
 
 
@@ -83,10 +135,140 @@ TDAにおいて主要な技術となるのがPersistent Homology\cite{Edelsbrunn
 \end{center}
 \end{figure}
 
+アルファ複体のフィルトレーションを用いて$0,1,2$次元パーシステント・ホモロジーを計算した。
+
+各次元のベッチ数を計算し、以下の図に示した
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=12cm]{fig/betti_1.png}	
+	\caption{1次ベッチ数}\label{fig:ts}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+	\includegraphics[width=12cm]{fig/betti_2.png}	
+	\caption{2次ベッチ数}\label{fig:ts}
+\end{center}
+\end{figure}
+
+ロボットアームごとに20本の系列をクラスタリングすることを考える。
+1次のベッチ数をもとにDTWを比類似度とした階層的クラスタリングを行った。
+クラスター間の距離は完全連結法（最遠距離法）を用いて算出した。
+そのデンドログラムを以下の図\ref{fig:dendro1}から図\ref{fig:dendro15}に示した
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_1.png}
+		\caption{デンドログラム1}
+		\label{fig:dendro1}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_2.png}
+		\caption{デンドログラム2}
+		\label{fig:dendro2}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_3.png}
+		\caption{デンドログラム3}
+		\label{fig:dendro3}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_4.png}
+		\caption{デンドログラム4}
+		\label{fig:dendro4}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_5.png}
+		\caption{デンドログラム5}
+		\label{fig:dendro5}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_6.png}
+		\caption{デンドログラム6}
+		\label{fig:dendro6}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_7.png}
+		\caption{デンドログラム7}
+		\label{fig:dendro7}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_8.png}
+		\caption{デンドログラム8}
+		\label{fig:dendro8}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_9.png}
+		\caption{デンドログラム9}
+		\label{fig:dendro9}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_10.png}
+		\caption{デンドログラム10}
+		\label{fig:dendro10}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_11.png}
+		\caption{デンドログラム11}
+		\label{fig:dendro11}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_12.png}
+		\caption{デンドログラム12}
+		\label{fig:dendro12}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_13.png}
+		\caption{デンドログラム13}
+		\label{fig:dendro13}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_14.png}
+		\caption{デンドログラム14}
+		\label{fig:dendro14}
+	\end{center}
+\end{figure}
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=15cm]{fig/dendro_15.png}
+		\caption{デンドログラム15}
+		\label{fig:dendro15}
+
+	\end{center}
+\end{figure}
+
 
 \section{Persistent Diagramとその要約}
 
-位相幾何学的データ分析の中でもキーとなるのが，Persistent Homology(PH)である．
+
 本節では，例として次の図\ref{fig:PCex}の点群を考えることとする．
 \begin{figure}[H]
 	\begin{center}

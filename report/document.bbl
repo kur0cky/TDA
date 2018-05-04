@@ -1,16 +1,45 @@
 \begin{thebibliography}{1}
 
+\bibitem{Singh2007}
+Gurjeet Singh, Facundo M{\'e}moli, and Gunnar~E. Carlsson.
+\newblock Topological methods for the analysis of high dimensional data sets
+  and 3d object recognition.
+\newblock In {\em SPBG}, 2007.
+
 \bibitem{Edelsbrunner2002}
 Edelsbrunner, Letscher, and Zomorodian.
 \newblock Topological persistence and simplification.
 \newblock {\em Discrete \& Computational Geometry}, Vol.~28, No.~4, pp.
   511--533, Nov 2002.
 
+\bibitem{Umeda2017}
+Yuhei Umeda.
+\newblock Time series classification via topological data analysis.
+\newblock 人工知能学会論文誌, Vol.~32, No.~3, pp. 1--12, 2017.
+
+\bibitem{Amenta2007}
+Nina Amenta, Dominique Attali, and Olivier Devillers.
+\newblock Complexity of delaunay triangulation for points on lower-dimensional
+  polyhedra.
+\newblock In {\em SODA}, 2007.
+
+\bibitem{Attali2003}
+Dominique Attali and Jean-Daniel Boissonnat.
+\newblock Complexity of the delaunay triangulation of points on polyhedral
+  surfaces.
+\newblock {\em Discrete Comput. Geom.}, Vol.~30, No.~3, pp. 437--452, September
+  2003.
+
 \bibitem{Truong2017}
 Patrick Truong.
 \newblock An exploration of topological properties of high-frequency
   one-dimensional financial time series data using tda.
 \newblock Master's thesis, KTH, Mathematical Statistics, 2017.
+
+\bibitem{Berndt1996}
+Donald Berndt and James Clifford.
+\newblock Finding patterns in time series: a dynamic programming approach.
+\newblock pp. 229--248, 02 1996.
 
 \bibitem{Turner2014}
 Katharine Turner, Yuriy Mileyko, Sayan Mukherjee, and John Harer.
