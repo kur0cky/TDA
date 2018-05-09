@@ -1,0 +1,89 @@
+---
+title: "SOM"
+author: "Yutaka Kuroki"
+date: "2018年5月4日"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(class)
+```
+
+```{r}
+betti <- read_csv("data/mazda/processed/betti_seq.csv",
+                  col_types = "cicidd")
+```
+
+
+```{r}
+grid <- somgrid(xdim = 4,
+                ydim = 2,
+                topo = "hexagonal")
+som <- betti %>% 
+  transmute(name, dimension, number = str_c(type, number), radius, Betti) %>% 
+  group_by(name, dimension) %>% 
+  nest() %>% 
+  mutate(spread = map(data,
+                    ~ .x %>% 
+                      tidyr::spread(number, Betti)),
+         mat = map(spread,
+                   ~ .x %>% 
+                     select(-radius) %>% 
+                     t() ),
+         som = map(mat,
+                   ~ .x %>% 
+                     SOM(grid = grid,
+                         rlen=500000)))
+
+
+```
+
+```{r}
+for(i in 1:15){
+  plot(som$som[[i]])
+  
+  haizoku <- as.numeric(knn(som$som[[i]]$codes,som$mat[[i]], 1:8))
+  out.new<-som$som[[i]]$grid$pts[haizoku,] +cbind(rnorm(20,sd=.2), rnorm(20, sd=.1))
+  
+  points(out.new, 
+         col=rep(c(2,4),each=10),
+         pch = rep(c(2,4),each=10))
+  Sys.sleep(1)
+
+}
+```
+
+```{r}
+tmp <- som %>% 
+  select(name, dimension, mat) %>% 
+  spread(dimension, mat)
+  
+tmp2 <- tmp %>% 
+  mutate(mat = map2(`1`,`2`,
+                    ~ bind_cols(as_tibble(.x),as_tibble(.y))),
+         # mat = map2(mat, `2`,
+         #            ~ bind_cols(.x, as_tibble(.y)) %>% 
+         #              as.matrix()),
+         som = map(mat,
+                   ~ .x %>% 
+                     SOM(grid = grid,
+                         rlen=100000)))
+```
+
+```{r}
+for(i in c(1,5,6,9,10,11,12,15)){
+  plot(tmp2$som[[i]])
+  
+  haizoku <- as.numeric(knn(tmp2$som[[i]]$codes,tmp2$mat[[i]], 1:8))
+  out.new<-tmp2$som[[i]]$grid$pts[haizoku,] +cbind(rnorm(20,sd=.15), rnorm(20, sd=.15))
+  
+  points(out.new, 
+         col=rep(c(2,4),each=10),
+         pch = rep(c(15,16),each=10))
+  Sys.sleep(1)
+
+}
+```

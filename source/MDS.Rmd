@@ -1,0 +1,40 @@
+---
+title: "MDS"
+author: "Yutaka Kuroki"
+date: "2018年5月6日"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+betti <- read_csv("data/mazda/processed/betti_seq.csv") 
+```
+
+```{r}
+dist <- betti %>% 
+  filter(dimension == 1) %>% 
+  mutate(number = str_c(type, number)) %>% 
+  select(-dimension, -type) %>% 
+  group_by(name) %>% 
+  nest() %>%
+  mutate(mat = map(data,
+                    ~ .x %>% 
+                      spread(number, Betti) %>% 
+                      select(-radius) %>% 
+                      t()),
+         dist = map(mat, ~ .x %>% TSclust::diss("DTWARP")),
+         mds = map(dist, ~ cmdscale(.x, k=2))) 
+```
+
+
+```{r}
+dist %>% 
+  saveRDS("data/mazda/processed/mds.RDS")
+```
+

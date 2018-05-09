@@ -1,0 +1,77 @@
+---
+title: "MDS_plot"
+author: "Yutaka Kuroki"
+date: "2018年5月8日"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r}
+library(tidyverse)
+library("gridExtra")
+```
+
+
+```{r}
+tmp <- readRDS("data/mazda/processed/MDS.RDS")
+ts <- read_csv("data/mazda/processed/data.csv")
+```
+
+```{r}
+tmp2 <- tmp %>% 
+  mutate(mds = map(mds,
+                   ~ .x %>% 
+                     as.data.frame() %>% 
+                     rownames_to_column("number") %>% 
+                     as_tibble() %>% 
+                     mutate(type = str_sub(number, 1,1))),
+         plot = map2(mds,name,
+                    ~ .x %>% 
+                      ggplot(aes(V1, V2, colour=type))+
+                      geom_text(aes(label=number), size = 2)+
+                      labs(title = .y, x = "MDS1", y = "MDS2")+
+                      theme_bw()+
+                      theme(text = element_text(size = 5))))
+```
+
+```{r}
+ts <- ts %>% 
+  select(name, type, number, index, value) %>% 
+  group_by(name) %>% 
+  nest(.key = "ts")
+```
+
+```{r}
+tmp3 <- tmp2 %>% 
+  left_join(ts, by = "name")
+
+
+tmp3$ts[[1]]
+tmp4 <- tmp3 %>% 
+  mutate(ts_plot = map(ts,
+                       ~ .x %>% 
+                         ggplot(aes(index, value))+
+                         geom_line()+
+                         facet_grid(number ~ type)+
+                         theme_bw()+
+                         theme(text = element_text(size = 5))))
+```
+
+```{r}
+grid.arrange(tmp4$plot[[1]], tmp4$ts_plot[[1]], ncol=1)
+```
+
+```{r}
+plots <- list()
+for(i in 1:15){
+  plots[[i]] <- arrangeGrob(tmp4$plot[[i]], tmp4$ts_plot[[i]], ncol = 1)
+  ggsave(plot = plots[[i]],
+         str_c("report/fig/MDS", i, ".png"),
+         units = "cm",
+         height = 12,
+         width = 8)
+}
+```
+
