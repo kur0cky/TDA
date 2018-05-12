@@ -1,0 +1,53 @@
+---
+title: "envelope"
+author: "Yutaka Kuroki"
+date: "2018/5/11"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+data <- read_csv("data/mazda/processed/data.csv")
+```
+
+
+```{r}
+envelope <- function(x, cepCoef=10) {
+ library(tidyverse)
+ N <- length(x)
+ spec <- Re(fft(x)/N)^2
+ ceps <- spec %>%
+   log10() %>%
+   fft()
+ ceps[cepCoef:(length(ceps)-cepCoef)] <- 0
+ envelope <- fft(ceps, inverse=TRUE)/N
+ # return(Re(envelope[1:(length(envelope)/2)]))
+ return(data.frame(envelope = Re(envelope[1:(length(envelope)/2)]),
+                   spec = log10(spec)[1:(length(envelope)/2)]) %>% 
+          mutate(index = 1:n()))
+}
+```
+
+
+```{r}
+spec <- data %>% 
+  group_by(name, type, number) %>% 
+  nest() %>% 
+  mutate(spec = map(data,
+                    ~ .x$value %>% 
+                      envelope(cepCoef=20)))
+
+spec %>% 
+  select(name, type, number, spec) %>% 
+  unnest() %>% 
+  mutate(resid = spec - envelope) %>% 
+  write_csv("data/mazda/processed/envelope.csv")
+```
+
+

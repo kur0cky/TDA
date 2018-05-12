@@ -1,0 +1,38 @@
+---
+title: "landscape"
+author: "Yutaka Kuroki"
+date: "2018/5/11"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(TDA)
+```
+
+```{r}
+diags <- read_csv("data/mazda/processed/diags.csv",
+                  col_types = "cicidd")
+```
+
+```{r}
+t <- proc.time()
+diags %>% 
+  group_by(name, number, type) %>% 
+  nest() %>% 
+  mutate(data = map(data,~ as.matrix(.x)),
+         tseq = map(data, 
+                    ~ seq(0,2, length=100))) ->tmp
+lands <- tmp %>% 
+  mutate(land_1 = map2(data, tseq,
+                   ~ landscape(.x, dimension = 1, KK = 1, .y)),
+         land_2 = map2(data, tseq,
+                   ~ landscape(.x, dimension = 2, KK = 1, .y)))
+lands %>% 
+  select(name, number, type, tseq, land_1, land_2) %>% 
+  unnest() %>% 
+  write_csv("data/mazda/processed/lands.csv")
+```
+

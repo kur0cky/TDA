@@ -1,5 +1,5 @@
 ---
-title: "MDS_plot"
+title: "MDS_envelope_plot"
 author: "Yutaka Kuroki"
 date: "2018年5月8日"
 output: html_document
@@ -15,7 +15,7 @@ library("gridExtra")
 
 
 ```{r}
-tmp <- readRDS("data/mazda/processed/mds.RDS")
+tmp <- readRDS("data/mazda/processed/MDS_envelope.RDS")
 ts <- read_csv("data/mazda/processed/data.csv")
 ```
 
@@ -68,7 +68,7 @@ plots <- list()
 for(i in 1:15){
   plots[[i]] <- arrangeGrob(tmp4$plot[[i]], tmp4$ts_plot[[i]], ncol = 1)
   ggsave(plot = plots[[i]],
-         str_c("report/fig/MDS", i, ".png"),
+         str_c("report/fig/MDS_envelope", i, ".png"),
          units = "cm",
          height = 12,
          width = 8)

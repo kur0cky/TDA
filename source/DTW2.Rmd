@@ -1,0 +1,57 @@
+---
+title: "DTW2"
+author: "Yutaka Kuroki"
+date: "2018/5/11"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+lands <- readRDS("data/mazda/processed/lands.RDS")
+```
+
+```{r}
+DTW2 <- lands %>% 
+  select(name, number, type, tseq, land_1, land_2) %>% 
+  unnest() %>% 
+  select(-land_2) %>% 
+  mutate(number = str_c(type, number)) %>% 
+  select(-type) %>% 
+  group_by(name) %>% 
+  nest() %>%
+  mutate(mat = map(data,
+                    ~ .x %>% 
+                      spread(number, land_2) %>% 
+                      select(-tseq) %>% 
+                      t()),
+         dist = map(mat, ~ .x %>% TSclust::diss("DTWARP")),
+         mds = map(dist, ~ cmdscale(.x, k=2))) %>% 
+  mutate(mds = map(mds,
+                   ~ .x %>% 
+                     as.data.frame() %>% 
+                     rownames_to_column("number") %>% 
+                     as_tibble() %>% 
+                     mutate(type = str_sub(number, 1,1))))
+```
+
+```{r}
+DTW2 %>% 
+  select(name, mds) %>% 
+  unnest() %>% 
+  as_tibble() %>% 
+  ggplot(aes(V1, V2, colour=type))+
+  geom_point()+
+  facet_wrap(~name, scales="free")
+```
+
+
+```{r}
+DTW2 %>% 
+  saveRDS("data/mazda/processed/DTW2.RDS")
+```
+

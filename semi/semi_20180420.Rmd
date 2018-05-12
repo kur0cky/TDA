@@ -197,7 +197,7 @@ res <- tibble(tau = c(1, 20, 50, 100)) %>%
                       mutate(dimension = as.factor(dimension)) %>% 
                       filter(!is.infinite(Death))),
          tseq = map(diag, 
-                    ~ seq(0,max(.x$Death), by = 0.01)),
+                    ~ seq(0,3, length=100)),
          land_1 = map2(diag, tseq,
                    ~ landscape(.x, dimension = 1, KK = 1, .y)),
          land_2 = map2(diag, tseq,
@@ -214,6 +214,19 @@ res %>%
   geom_abline()+
   theme_bw()+
   facet_grid(~tau)
+```
+
+```{r}
+res$diag[[3]] %>% 
+  ggplot(aes(Birth, Death, colour = dimension))+
+  geom_point(size = 1)+
+  geom_abline()+
+  theme_bw()+
+  theme(text = element_text(size=6))
+ggsave("report/fig/persistent_diagram.png",
+       height = 5,
+       width = 8,
+       units = "cm")
 ```
 
 2次元のホモロジーなら$\tau = 20$、1次元のホモロジーなら$\tau = 100$ではっきりと出ていることが分かる

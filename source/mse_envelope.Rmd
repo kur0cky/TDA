@@ -1,0 +1,41 @@
+---
+title: "MDS_envelope"
+author: "Yutaka Kuroki"
+date: "2018年5月6日"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+env <- read_csv("data/mazda/processed/envelope.csv") 
+```
+
+```{r}
+dist <- env %>% 
+  filter(index %% 25==0) %>% 
+  mutate(number = str_c(type, number)) %>% 
+  select(-spec, -resid) %>% 
+  group_by(name) %>% 
+  nest() %>%
+  mutate(mat = map(data,
+                    ~ .x %>% 
+                     select(-type) %>% 
+                      spread(number, envelope) %>% 
+                     select(-index) %>% 
+                      t()),
+         dist = map(mat, ~ .x %>% TSclust::diss("DTWARP")),
+         mds = map(dist, ~ cmdscale(.x, k=2))) 
+```
+
+
+```{r}
+dist %>% 
+  saveRDS("data/mazda/processed/mds_envelope.RDS")
+```
+
