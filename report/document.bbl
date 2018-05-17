@@ -1,16 +1,5 @@
 \begin{thebibliography}{10}
 
-\bibitem{Berndt1996}
-Donald Berndt and James Clifford.
-\newblock Finding patterns in time series: a dynamic programming approach.
-\newblock pp. 229--248, 02 1996.
-
-\bibitem{Chouakria2007}
-Ahlame~Douzal Chouakria and Panduranga~Naidu Nagabhushan.
-\newblock Adaptive dissimilarity index for measuring time series proximity.
-\newblock {\em Advances in Data Analysis and Classification}, Vol.~1, No.~1,
-  pp. 5--21, Mar 2007.
-
 \bibitem{Edelsbrunner2002}
 Edelsbrunner, Letscher, and Zomorodian.
 \newblock Topological persistence and simplification.
@@ -22,6 +11,48 @@ Nina Otter, Mason~A. Porter, Ulrike Tillmann, Peter Grindrod, and Heather~A.
   Harrington.
 \newblock A roadmap for the computation of persistent homology.
 \newblock {\em EPJ Data Science}, Vol.~6, No.~1, p.~17, Aug 2017.
+
+\bibitem{Lamar2012}
+Javier Lamar, Edel Garcia, and Rocio Gonzalez-Diaz.
+\newblock Human gait identification using persistent homology.
+\newblock pp. 244--251, 09 2012.
+
+\bibitem{Platt2016}
+Daniel Platt, Saugata Basu, Pierre Zalloua, and Laxmi Parida.
+\newblock Characterizing redescriptions using persistent homology to isolate
+  genetic pathways contributing to pathogenesis.
+\newblock Vol.~10, , 01 2016.
+
+\bibitem{Gidea2017}
+Marian Gidea.
+\newblock Topological data analysis of critical transitions in financial
+  networks.
+\newblock In Erez Shmueli, Baruch Barzel, and Rami Puzis, editors, {\em 3rd
+  International Winter School and Conference on Network Science}, pp. 47--59,
+  Cham, 2017. Springer International Publishing.
+
+\bibitem{Gidea2018}
+Marian Gidea and Yuri Katz.
+\newblock Topological data analysis of financial time series: Landscapes of
+  crashes.
+\newblock {\em Physica A: Statistical Mechanics and its Applications}, Vol.
+  491, pp. 820 -- 834, 2018.
+
+\bibitem{Berndt1996}
+Donald Berndt and James Clifford.
+\newblock Finding patterns in time series: a dynamic programming approach.
+\newblock pp. 229--248, 02 1996.
+
+\bibitem{Chouakria2007}
+Ahlame~Douzal Chouakria and Panduranga~Naidu Nagabhushan.
+\newblock Adaptive dissimilarity index for measuring time series proximity.
+\newblock {\em Advances in Data Analysis and Classification}, Vol.~1, No.~1,
+  pp. 5--21, Mar 2007.
+
+\bibitem{Hyvarinen2000}
+A.~Hyvarinen and E.~Oja.
+\newblock Independent component analysis: algorithms and applications.
+\newblock {\em Neural Networks}, Vol.~13, No.~4, pp. 411 -- 430, 2000.
 
 \bibitem{Mileyko2011}
 Yuriy Mileyko, Sayan Mukherjee, and John Harer.
@@ -38,6 +69,19 @@ Gurjeet Singh, Facundo M{\'e}moli, and Gunnar~E. Carlsson.
 \newblock Topological methods for the analysis of high dimensional data sets
   and 3d object recognition.
 \newblock In {\em SPBG}, 2007.
+
+\bibitem{Zomorodian2005}
+Afra Zomorodian and Gunnar Carlsson.
+\newblock Computing persistent homology.
+\newblock {\em Discrete {\&} Computational Geometry}, Vol.~33, No.~2, pp.
+  249--274, Feb 2005.
+
+\bibitem{Takens1981}
+Floris Takens.
+\newblock {Detecting Strange Attractors in Turbulence}.
+\newblock In David Rand and Lai-Sang Young, editors, {\em Dynamical Systems and
+  Turbulence, Warwick 1980}, Vol. 898 of {\em Lecture Notes in Mathematics},
+  chapter~21, pp. 366--381. Springer, Berlin, 1981.
 
 \bibitem{Amenta2007}
 Nina Amenta, Dominique Attali, and Olivier Devillers.
