@@ -38,6 +38,13 @@ Marian Gidea and Yuri Katz.
 \newblock {\em Physica A: Statistical Mechanics and its Applications}, Vol.
   491, pp. 820 -- 834, 2018.
 
+\bibitem{Hiraoka2012}
+Marcio Gameiro, Yasuaki Hiraoka, Shunsuke Izumi, Miroslav Kramar, Konstantin
+  Mischaikow, and Vidit Nanda.
+\newblock Topological measurement of protein compressibility via persistence
+  diagrams.
+\newblock 2012-06-04.
+
 \bibitem{Berndt1996}
 Donald Berndt and James Clifford.
 \newblock Finding patterns in time series: a dynamic programming approach.
@@ -75,6 +82,12 @@ Afra Zomorodian and Gunnar Carlsson.
 \newblock Computing persistent homology.
 \newblock {\em Discrete {\&} Computational Geometry}, Vol.~33, No.~2, pp.
   249--274, Feb 2005.
+
+\bibitem{Bubenik2015}
+Peter Bubenik.
+\newblock Statistical topological data analysis using persistence landscapes.
+\newblock {\em Journal of Machine Learning Research}, Vol.~16, pp. 77--102,
+  2015.
 
 \bibitem{Takens1981}
 Floris Takens.
