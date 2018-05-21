@@ -43,7 +43,7 @@ Marcio Gameiro, Yasuaki Hiraoka, Shunsuke Izumi, Miroslav Kramar, Konstantin
   Mischaikow, and Vidit Nanda.
 \newblock Topological measurement of protein compressibility via persistence
   diagrams.
-\newblock 2012-06-04.
+\newblock {\em MI Preprint Series}, Vol. 2012-6, , 2012-06-04.
 
 \bibitem{Berndt1996}
 Donald Berndt and James Clifford.
@@ -56,6 +56,21 @@ Ahlame~Douzal Chouakria and Panduranga~Naidu Nagabhushan.
 \newblock {\em Advances in Data Analysis and Classification}, Vol.~1, No.~1,
   pp. 5--21, Mar 2007.
 
+\bibitem{Garcia2017}
+Diego Rivera-Garc{\'i}a, Luis~Angel Garc{\'i}a-Escudero, Agust{\'i}n
+  Mayo-Iscar, and Joaqu{\'i}n Ortega.
+\newblock Robust clustering for time series using spectral densities and
+  functional data analysis.
+\newblock In Ignacio Rojas, Gonzalo Joya, and Andreu Catala, editors, {\em
+  Advances in Computational Intelligence}, pp. 142--153, Cham, 2017. Springer
+  International Publishing.
+
+\bibitem{Sakurai2007}
+Y.~Sakurai, C.~Faloutsos, and M.~Yamamuro.
+\newblock Stream monitoring under the time warping distance.
+\newblock In {\em 2007 IEEE 23rd International Conference on Data Engineering},
+  pp. 1046--1055, April 2007.
+
 \bibitem{Hyvarinen2000}
 A.~Hyvarinen and E.~Oja.
 \newblock Independent component analysis: algorithms and applications.
@@ -65,6 +80,12 @@ A.~Hyvarinen and E.~Oja.
 Yuriy Mileyko, Sayan Mukherjee, and John Harer.
 \newblock Probability measures on the space of persistence diagrams.
 \newblock {\em Inverse Problems}, Vol.~27, No.~12, p. 124007, 2011.
+
+\bibitem{Bubenik2015}
+Peter Bubenik.
+\newblock Statistical topological data analysis using persistence landscapes.
+\newblock {\em Journal of Machine Learning Research}, Vol.~16, pp. 77--102,
+  2015.
 
 \bibitem{Umeda2017}
 Yuhei Umeda.
@@ -82,12 +103,6 @@ Afra Zomorodian and Gunnar Carlsson.
 \newblock Computing persistent homology.
 \newblock {\em Discrete {\&} Computational Geometry}, Vol.~33, No.~2, pp.
   249--274, Feb 2005.
-
-\bibitem{Bubenik2015}
-Peter Bubenik.
-\newblock Statistical topological data analysis using persistence landscapes.
-\newblock {\em Journal of Machine Learning Research}, Vol.~16, pp. 77--102,
-  2015.
 
 \bibitem{Takens1981}
 Floris Takens.
