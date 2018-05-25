@@ -89,3 +89,110 @@ tmp <- MDS_betti %>%
                                 theme_bw()+
                                 theme(legend.position = 'none')+
                                 theme(text = element_text(size = 5))))
+
+
+DTW_betti1 <- MDS_betti %>% 
+  select(name, betti1) %>% 
+  mutate(betti1 = map(betti1,
+                      ~ .x %>% 
+                        mutate(index = 1:nrow(.x)) %>% 
+                        gather(key, value, -index))) %>% 
+  unnest() %>% 
+  filter(str_sub(key, 1, 1) == "a") %>% 
+  mutate(name = fct_anon(as.factor(name))) %>% 
+  transmute(name = str_c(name, key), index, betti1 = value) %>% 
+  spread(name, betti1) %>% 
+  select(-index) %>% 
+  diss(METHOD = "DTWARP")
+
+
+DTW_land1 <- MDS_lands %>% 
+  mutate(name = fct_anon(as.factor(name))) %>% 
+  select(name, land1) %>% 
+  mutate(land1 = map(land1, 
+                     ~ .x %>% 
+                       mutate(index = 1:nrow(.x)) %>% 
+                       gather(key, value, -index))) %>% 
+  unnest() %>% 
+  filter(str_sub(key, 1, 1) == "a") %>% 
+  transmute(name = str_c(name, key), index, land1 = value) %>% 
+  spread(name, land1) %>% 
+  select(-index) %>% 
+  diss(METHOD = "DTWARP")
+
+
+MDS_betti1 <- cmdscale(DTW_betti1, k = 1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column("name") 
+MDS_land1 <- cmdscale(DTW_land1, k = 1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column("name") 
+
+MDS_land1 %>% 
+  left_join(MDS_betti1, by = "name") %>% 
+  mutate(arm = str_sub(name, 1,2)) %>% 
+  as_tibble() %>% 
+  ggplot(aes(V1.x, V1.y, colour = arm))+
+  geom_text(aes(label = arm), size=2)+
+  theme_bw()+
+  theme(text = element_text(size = 5))
+
+ggsave("report/fig/aftre_MDS.png",
+       units = "cm",
+       height = 8,
+       width = 8)
+
+
+
+
+## before ----
+DTW_betti1 <- MDS_betti %>% 
+  select(name, betti1) %>% 
+  mutate(betti1 = map(betti1,
+                      ~ .x %>% 
+                        mutate(index = 1:nrow(.x)) %>% 
+                        gather(key, value, -index))) %>% 
+  unnest() %>% 
+  filter(str_sub(key, 1, 1) == "b") %>% 
+  mutate(name = fct_anon(as.factor(name))) %>% 
+  transmute(name = str_c(name, key), index, betti1 = value) %>% 
+  spread(name, betti1) %>% 
+  select(-index) %>% 
+  diss(METHOD = "DTWARP")
+
+
+DTW_land1 <- MDS_lands %>% 
+  mutate(name = fct_anon(as.factor(name))) %>% 
+  select(name, land1) %>% 
+  mutate(land1 = map(land1, 
+                     ~ .x %>% 
+                       mutate(index = 1:nrow(.x)) %>% 
+                       gather(key, value, -index))) %>% 
+  unnest() %>% 
+  filter(str_sub(key, 1, 1) == "b") %>% 
+  transmute(name = str_c(name, key), index, land1 = value) %>% 
+  spread(name, land1) %>% 
+  select(-index) %>% 
+  diss(METHOD = "DTWARP")
+
+
+MDS_betti1 <- cmdscale(DTW_betti1, k = 1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column("name") 
+MDS_land1 <- cmdscale(DTW_land1, k = 1) %>% 
+  as.data.frame() %>% 
+  rownames_to_column("name") 
+
+MDS_land1 %>% 
+  left_join(MDS_betti1, by = "name") %>% 
+  mutate(arm = str_sub(name, 1,2)) %>% 
+  as_tibble() %>% 
+  ggplot(aes(V1.x, V1.y, colour = arm))+
+  geom_text(aes(label = arm), size=2)+
+  theme_bw()+
+  theme(text = element_text(size = 5))
+
+ggsave("report/fig/before_MDS.png",
+       units = "cm",
+       height = 8,
+       width = 8)

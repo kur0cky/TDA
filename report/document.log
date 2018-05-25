@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.7.1-161114-2.6 (utf8.euc) (TeX Live 2017) (preloaded format=platex 2018.4.20)  21 MAY 2018 20:00
+This is e-pTeX, Version 3.14159265-p3.7.1-161114-2.6 (utf8.euc) (TeX Live 2017) (preloaded format=platex 2018.4.20)  25 MAY 2018 10:23
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -235,10 +235,10 @@ LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <12> not available
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
 (Font)              Font shape `JY1/gt/m/n' tried instead on input line 86.
 
-[3]
+[3] [4]
 File: fig/ts.png Graphic file (type bmp)
 <fig/ts.png>
- [4] [5] [6]
+ [5] [6]
 File: fig/betti_1.png Graphic file (type bmp)
 <fig/betti_1.png>
  [7]
@@ -375,6 +375,6 @@ Here is how much of TeX's memory you used:
  5695 multiletter control sequences out of 15000+600000
  18276 words of font info for 73 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
- 27i,7n,24p,267b,315s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 27i,7n,24p,403b,315s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on document.dvi (29 pages, 43836 bytes).
+Output written on document.dvi (29 pages, 45912 bytes).
